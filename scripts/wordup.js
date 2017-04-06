@@ -144,10 +144,10 @@ function render() {
 
 
     // Set the value of the textbox
-    $("#textbox").focus(val(model.currentAttempt));
+    $("#textbox").focus();
     // TODO 3
     // Give focus to the textbox.
-
+    // val(model.currentAttempt)
 
     // if the current word attempt contains disallowed letters,
     var disallowedLetters = disallowedLettersInWord(model.currentAttempt);
