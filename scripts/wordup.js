@@ -131,23 +131,26 @@ function render() {
     // TODO 10
     // Add a few things to the above code block (underneath "// clear stuff").
 
-
+    $("#textbox").removeClass("bad-attempt");
+    $(".disallowed-letter").remove();
+    $("#textbox").attr("disabled", false);
     // reveal the #game container
     $("#game").show();
 
     // render the letter tiles
     var letterChips = model.allowedLetters.map(letterChip)
-    $("#allowed-letters").append(letterChips);
+   $("#allowed-letters").append(letterChips);
 
     // TODO 11
     // Render the word submissions
-
+    var wordTiles = model.wordSubmissions.map(wordSubmissionChip)
+    $("#word-submissions").append(wordTiles);
 
     // Set the value of the textbox
-    $("#textbox").focus();
+    $("#textbox").val(model.currentAttempt).focus();
     // TODO 3
     // Give focus to the textbox.
-    // val(model.currentAttempt)
+
 
     // if the current word attempt contains disallowed letters,
     var disallowedLetters = disallowedLettersInWord(model.currentAttempt);
@@ -160,7 +163,7 @@ function render() {
 
         // TODO 8
         // append the red letter chips to the form
-
+        $("#word-attempt-form").append(redLetterChips);
     }
 
     // if the game is over
@@ -168,7 +171,7 @@ function render() {
     if (gameOver) {
         // TODO 9
         // disable the text box and clear its contents
-
+        $("#textbox").attr("disabled", true).val("");
     }
 }
 
@@ -242,7 +245,9 @@ $(document).ready(function() {
     // Add another event handler with a callback function.
     // When the textbox content changes,
     // update the .currentAttempt property of the model and re-render
-
+    $("#textbox").on("input", function(evt) {
+          model.currentAttempt = $(this).val();
+      })
 
     // when the form is submitted
     $("#word-attempt-form").submit(function(evt) {
@@ -276,13 +281,18 @@ var scrabblePointsForEachLetter = {
  * Given a letter, checks whether that letter is "disallowed"
  * meaning it is not a member of the .allowedLetters list from the current model
  */
-function isDisallowedLetter(letter) {
-    // TODO 7
-    // This should return true if the letter is not an element of
-    // the .allowedLetters list in the model
-    return false;
-}
+ function isDisallowedLetter(letter) {
+     // TODO 7
+     // This should return true if the letter is not an element of
+     // the .allowedLetters list in the model
+     if (model.allowedLetters.indexOf(letter) < 0) {
 
+         return true;
+     } else {
+
+     return false;
+     }
+ }
 /**
  * Given a word, returns a list of all the disallowed letters in that word
  * Note that the list might be empty, if it contains only allowed letters.
@@ -299,7 +309,8 @@ function disallowedLettersInWord(word) {
 function containsOnlyAllowedLetters(word) {
     // TODO 12
     // Return the actual answer.
-    return true;
+
+    return disallowedLettersInWord(word).length==0;
 }
 
 /**
