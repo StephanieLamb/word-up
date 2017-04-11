@@ -54,7 +54,11 @@ function addNewWordSubmission(word) {
     // TODO 21
     // replace the hardcoded 'false' with the real answer
     var alreadyUsed = false;
-
+    model.wordSubmissions.forEach(function(item) {
+      if (item.word === word) {
+          alreadyUsed = true;
+          }
+      });
     // if the word is valid and hasn't already been used, add it
     if (containsOnlyAllowedLetters(word) && alreadyUsed == false) {
         model.wordSubmissions.push({ word: word });
@@ -74,7 +78,7 @@ function checkIfWordIsReal(word) {
     // make an AJAX call to the Pearson API
     $.ajax({
         // TODO 13 what should the url be?
-        url: "www.todo13.com",
+        url: "http://api.pearson.com/v2/dictionaries/lasde/entries?headword=" + word,
         success: function(response) {
             console.log("We received a response from Pearson!");
 
@@ -85,11 +89,15 @@ function checkIfWordIsReal(word) {
             // Replace the 'true' below.
             // If the response contains any results, then the word is legitimate.
             // Otherwise, it is not.
-            var theAnswer = true;
+            var theAnswer = response.results.length > 0;
 
             // TODO 15
             // Update the corresponding wordSubmission in the model
-
+            model.wordSubmissions.forEach(function(item) {
+              if (item.word === word) {
+                  item.isRealWord = theAnswer;
+                  }
+              });
 
             // re-render
             render();
@@ -208,13 +216,18 @@ function wordSubmissionChip(wordSubmission) {
         var scoreChip = $("<span></span>").text("⟐");
         // TODO 17
         // give the scoreChip appropriate text content
-
+        if (wordSubmission.isRealWord === true) {
+            var wordValue = wordScore(wordSubmission.word);
+            scoreChip = $("<span class = ' tag tag-sm tag-primary'></span>").text(" " + wordValue);
+        } else {
+            scoreChip = $("<span class = ' tag tag-sm tag-danger'></span>").text(" X");
+        }
         // TODO 18
         // give the scoreChip appropriate css classes
 
         // TODO 16
         // append scoreChip into wordChip
-
+        wordChip.append(scoreChip);
     }
 
     return wordChip;
@@ -342,7 +355,7 @@ function wordScore(word) {
     // Replace the empty list below.
     // Map the list of letters into a list of scores, one for each letter.
     var letterScores = [];
-
+    letterScores = letters.map(letterScore);
     // return the total sum of the letter scores
     return letterScores.reduce(add, 0);
 }
@@ -365,7 +378,8 @@ function currentScore() {
 
     // TODO 20
     // return the total sum of the word scores
-    return 0;
+    var realScore = wordScores.reduce(add, 0 );
+    return realScore;
 }
 
 
